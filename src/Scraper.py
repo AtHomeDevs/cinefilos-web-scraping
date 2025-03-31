@@ -13,6 +13,9 @@ class Scraper:
     def get_elements_by_class(self, html_class:str):
         return self.driver.find_elements(by=By.CLASS_NAME, value=html_class)
 
+    def get_element_by_class(self, html_class:str):
+        return self.driver.find_element(by=By.CLASS_NAME, value=html_class)
+
     def get_element_by_id(self, element_id:str):
         return self.driver.find_element(by=By.ID, value=element_id)
 

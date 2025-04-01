@@ -15,32 +15,8 @@ button = scraper.click_button('//*[@id="modalCinemas"]/div/div/div[2]/div/div[5]
 
 scraper.switch_element_display(f'.content-programacao.abaProgDay.aba_0')
 
-prog_day = scraper.get_element_by_class('abaProgDay')
-prog_day_info = prog_day.text.split('\n')
+prog_day = scraper.get_elements_by_class('filme')[1:]
 
-movies_data = list()
-last_list_break_index = 0
-for info in prog_day_info:
-    info_index = prog_day_info.index(info)
-    next_info = ''
-    next_info_index = info_index + 1
-    if next_info_index < len(prog_day_info):
-        next_info = prog_day_info[next_info_index]
-    else:
-        next_info = prog_day_info[info_index]
-
-    if info[-1:] == ':':
-        prog_day_info.pop(info_index)
-    elif len(info) > 2 and info[2] == ':' and ':' not in next_info[2] and 'Sala' not in next_info:
-        movie_data = []
-        if last_list_break_index == 0:
-            movie_data = prog_day_info[last_list_break_index:info_index+1]
-        else:
-            movie_data = prog_day_info[last_list_break_index+1:info_index+1]
-        movies_data.append(movie_data)
-        last_list_break_index = info_index
-
-movies_without_session_data = []
 movies = {
     'titulo_filme': [],
     'titulo_ano': [],
@@ -49,19 +25,72 @@ movies = {
     'duracao': [],
     'distribuidora': [],
     'estreia': [],
+    'sala': [],
+    'audio': [],
     'sessoes': []
 }
 
-for movie_data in movies_data:
-    movies['titulo_filme'].append(movie_data[0])
-    movies['titulo_ano'].append(movie_data[1])
-    movies['classificacao_indicativa'].append(movie_data[2])
-    movies['genero'].append(movie_data[3])
-    movies['duracao'].append(movie_data[4])
-    movies['distribuidora'].append(movie_data[5])
-    movies['estreia'].append(movie_data[6])
-    movies['sessoes'].append(movie_data[7:])
+def remove_unnecessary_session_data(session:list):
+    for data in session:
+        if 'Sala' in data:
+            session.pop(session.index(data))
+    for data in session:
+        if len(data) == 3:
+            session.pop(session.index(data))
 
-movie_info_df = pd.DataFrame(data=movies)
-print(movie_info_df.columns)
+def get_date():
+    aba_select = scraper.get_element_by_class('abaSelect')
+    aba_select_content = aba_select.text.split('\n')
+    return aba_select_content[0]
 
+for info in prog_day:
+    movie_data = info.text.split('\n')
+    if len(movie_data) > 1:
+        for data in movie_data:
+            if data[-1:] == ':':
+                movie_data.pop(movie_data.index(data))
+
+        movie = movie_data[:9]
+        sessions_data = movie_data[7:]
+        last_list_break_index = 0
+        rooms = []
+        audios = []
+        movie_sessions = []
+        for data in sessions_data:
+            if 'Sala' in data:
+                rooms.append(data)
+            elif len(data) == 3:
+                audios.append(data)
+
+            current_index = sessions_data.index(data)
+            if current_index + 1 < len(sessions_data):
+                next_index = current_index + 1
+                next_data = sessions_data[next_index]
+
+                if ':' in data and ':' not in next_data:
+                    session = sessions_data[last_list_break_index:next_index]
+                    remove_unnecessary_session_data(session)
+                    movie_sessions.append(session)
+                    last_list_break_index = next_index
+            else:
+                session = sessions_data[last_list_break_index:]
+                remove_unnecessary_session_data(session)
+                movie_sessions.append(session)
+
+        movies['titulo_filme'].append(movie[0])
+        movies['titulo_ano'].append(movie[1])
+        movies['classificacao_indicativa'].append(movie[2])
+        movies['genero'].append(movie[3])
+        movies['duracao'].append(movie[4])
+        movies['distribuidora'].append(movie[5])
+        movies['estreia'].append(movie[6])
+        movies['sala'].append(rooms)
+        movies['audio'].append(audios)
+        movies['sessoes'].append(movie_sessions)
+
+df = pd.DataFrame(data=movies).explode(['sala', 'audio', 'sessoes']).explode('sessoes').reset_index(drop=True)
+
+date = get_date()
+date_series = pd.Series([date])
+date_series = date_series.repeat(repeats=df.shape[0]).reset_index(drop=True)
+df['data'] = date_series

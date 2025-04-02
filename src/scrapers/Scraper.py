@@ -7,9 +7,6 @@ class Scraper:
     def open_url(self, url:str):
         self.driver.get(url)
 
-    def close_url(self):
-        self.driver.quit()
-
     def get_elements_by_class(self, html_class:str):
         return self.driver.find_elements(by=By.CLASS_NAME, value=html_class)
 

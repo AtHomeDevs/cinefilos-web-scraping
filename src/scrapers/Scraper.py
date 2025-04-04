@@ -1,5 +1,7 @@
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
+
 
 class Scraper:
     driver = Chrome()
@@ -19,8 +21,11 @@ class Scraper:
     def get_element_by_xpath(self, xpath:str):
         return self.driver.find_element(by=By.XPATH, value=xpath)
 
-    def click_button(self, xpath:str):
-        return self.get_element_by_xpath(xpath).click()
+    def click_on_element(self, element:WebElement):
+        element.click()
+
+    def get_element_children_by_class(self, element:WebElement, children_class:str):
+        return element.find_elements(by=By.CLASS_NAME, value=children_class)
 
     def switch_element_display(self, element_class:str):
         self.driver.execute_script(f"document.querySelector('{element_class}').style.display = 'block';")

@@ -21,11 +21,14 @@ class Scraper:
     def get_element_by_xpath(self, xpath:str):
         return self.driver.find_element(by=By.XPATH, value=xpath)
 
-    def click_on_element(self, element:WebElement):
+    @staticmethod
+    def click_on_element(element:WebElement):
         element.click()
 
-    def get_element_children_by_class(self, element:WebElement, children_class:str):
+    @staticmethod
+    def get_element_children_by_class(element:WebElement, children_class:str):
         return element.find_elements(by=By.CLASS_NAME, value=children_class)
 
-    def switch_element_display(self, element_class:str):
+    def set_elements_display_to_block(self, element_class:str):
         self.driver.execute_script(f"document.querySelector('{element_class}').style.display = 'block';")
+

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.CineshowDataHandler import CineshowDataHandler
+from src.cineshow_beiramar.service.CineshowDataHandler import CineshowDataHandler
 
 
 class CineshowDataframe:

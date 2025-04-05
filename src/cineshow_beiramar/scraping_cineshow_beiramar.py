@@ -1,8 +1,8 @@
 import pandas as pd
 
-from src.scrapers.Scraper import Scraper
-from src.scrapers.CineshowBeiramarScraper import CineshowBeiramarScraper
-from src.CineshowDataframe import CineshowDataframe
+from src.commom.Scraper import Scraper
+from src.cineshow_beiramar.scrapers.CineshowBeiramarScraper import CineshowBeiramarScraper
+from src.cineshow_beiramar.service.CineshowDataframe import CineshowDataframe
 
 
 scraper = CineshowBeiramarScraper()

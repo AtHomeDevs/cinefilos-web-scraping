@@ -1,6 +1,6 @@
 from selenium.webdriver.remote.webelement import WebElement
 
-from src.model.CineshowMovieScheduleData import CineshowMovieScheduleData
+from src.cineshow_beiramar.model.CineshowMovieScheduleData import CineshowMovieScheduleData
 
 
 class CineshowDataHandler:

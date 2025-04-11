@@ -1,6 +1,6 @@
 from selenium.webdriver.remote.webelement import WebElement
 
-from src.commom.Scraper import Scraper
+from src.common.Scraper import Scraper
 
 
 class CineshowBeiramarScraper(Scraper):
